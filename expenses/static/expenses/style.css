@@ -1,0 +1,64 @@
+body{
+    /* color: green; */
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+}
+
+.apptitle{
+    font-weight: 700;
+}
+
+.year-month{
+    font-weight: 600;
+}
+
+.month-stats:nth-child(1){
+    font-weight: 400;
+    background-color: #ffe05d;
+    color: black;
+}
+
+.badge-saved{
+    font-weight: 400;
+    background-color: #cceabb;
+}
+
+.badge-expended{
+    font-weight: 400;
+    background-color: #ea5455;
+}
+
+.badge-same{
+    font-weight: 400;
+    background-color: #aaaaaa;
+}
+
+.amount{
+    font-weight: 400;
+}
+
+.past-expense{
+    background-color: transparent;
+}
+
+.past-expense:hover{
+    background-color: green;
+}
+
+
+.shrugged{
+    color: lightgray;
+    font-size: 8rem;
+}
+
+.shrugged-caption{
+    color: lightgray;
+}
+
+.ctitle{
+    font-weight: 400;
+}
+
+.update-input{
+    background-color: #fff0ad;
+}

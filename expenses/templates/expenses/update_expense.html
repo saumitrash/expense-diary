@@ -1,0 +1,48 @@
+{% extends "expenses/base.html" %}
+
+{% load static %}
+
+{% load humanize %}
+
+{% block title %} Add Expense {% endblock %}
+
+{% block content %}
+
+<div class="container mt-5" style="max-width: 50%;">
+    <h4 class="mb-5 text-center">Update expense #{{expense.id}} </h4>
+
+    <form action="{% url 'expenses:update' expense.id %}" method="post">
+
+        {% csrf_token %}
+
+        <div class="row mb-3">
+            <label for="inputText3" class="col-sm-2 col-form-label">Paid for</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control update-input" name="title" value="{{expense.title}}" id="inputText3">
+            </div>
+          </div>
+    
+          <div class="row mb-3">
+            <label for="inputDesc3" class="col-sm-2 col-form-label">Description</label>
+            
+            <div class="col-sm-10">
+              <input type="text" class="form-control update-input" name="desc" value="{{expense.description}}" id="inputDesc3">
+            </div>
+          </div>
+    
+          <div class="row mb-3">
+            <label for="inputPrice3" class="col-sm-2 col-form-label">Amount Paid</label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control update-input" name="price" value="{{expense.amount}}" id="inputPrice3">
+            </div>
+          </div>
+    
+          <a class="btn btn-secondary float-end" href="{% url 'expenses:home' %}" role="button">Cancel</a>
+          <button type="submit" class="btn btn-primary float-end me-3">Update</button>
+    
+    </form>
+</div>
+
+
+
+{% endblock %}

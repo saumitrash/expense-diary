@@ -1,0 +1,116 @@
+{% extends "expenses/base.html" %}
+
+{% load static %}
+
+{% load humanize %}
+
+{% block content %}
+
+    <h1 class="mt-5"><span class="badge bg-dark apptitle">📚 Expense Diary</span></h1>
+
+    <h3 class="mt-5">Your Expenses in <span class="text-primary year-month">{{captured_date|date:'F, Y'}}</span></h3>
+
+    <h4>
+        Monthly Expense: 
+        <span class="badge month-stats text-dark"> <!-- bg-warning text-dark -->
+            Rs. 
+            {% if curr_monthly_expense > 1000000 %}
+                {{curr_monthly_expense|intword}}
+            {% else %}
+                {{curr_monthly_expense|intcomma}}
+            {% endif %}
+        </span>
+        <span class="badge month-stats text-{{progress.color.text}} badge-{{progress.color.bg}}"> <!-- bg-{{progress.color}} -->
+                Rs. 
+                {% if progress.difference > 1000000 %}
+                    {{progress.difference|intword}}
+                {% else %}
+                    {{progress.difference|intcomma}}
+                {% endif %}
+            {{progress.tail}}
+        </span>
+    </h3>
+
+
+    {% if show_add_button %}
+        <a class="btn btn-outline-dark mt-5 me-md-3 greenbg" href="{% url 'expenses:add' %}" role="button">💰 Add Expense</a>
+    {% endif %}
+
+    <a class="btn btn-outline-secondary mt-5 me-md-3 past-expense" href="{% url 'expenses:index' captured_date.year captured_date.month|add:'-1' %}" role="button">📆 Past Month</a>
+
+    {% if not show_add_button %}
+        <a class="btn btn-outline-primary mt-5" href="{% url 'expenses:home' %}" role="button">🏡 Go back to home</a>
+    {% endif %}
+    
+    <hr class="mt-5">
+
+    <!-- change expenses:page_obj -->
+    {% if not page_obj %}
+        <h1 class="shrugged text-center mt-5">¯\_(ツ)_/¯</h1>
+        <h5 class="mt-4 text-center shrugged-caption">No expenses were found</h5>
+
+    {% else %}
+
+
+    <div class="row row-cols-3 row-cols-sm-3 g-4 mt-3">
+        <!-- change expenses:page_obj -->
+        {% for expense in page_obj %}
+        <div class="col">
+            <div class="card text-dark bg-transparent mb-3" style="max-width: 22rem;">
+
+                <div class="card-header amount">
+                    Rs. 
+                    {% if expense.amount > 1000000 %}
+                        {{expense.amount|intword}}
+                    {% else %}
+                        {{expense.amount|intcomma}}
+                    {% endif %}
+                    <a href="{% url 'expenses:update' expense.id%}" class="editIcon link-primary float-end">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175l-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title ctitle">{{expense.title|truncatechars:25}}</h5>
+                    <p class="card-text">{{ expense.description|truncatechars:25 }}</p>
+                    <a href="{% url 'expenses:detail' expense.id %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                    <a href="{% url 'expenses:delete_expense' expense.id%}" class="btn btn-outline-danger btn-sm float-end"  data-bs-toggle="tooltip" data-bs-placement="right" title="Delete">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+  </div>
+
+  {% endif %}
+
+  <div class="pagination text-center mx-auto d-block" style="max-width: 300px;">
+    <span class="step-links">
+
+        <span class="mt-5 d-block">
+            {% if page_obj.has_previous %}
+                    <a href="?page=1" class="me-3">&laquo; first</a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="me-3">previous</a>
+            {% endif %}
+
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="me-3">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+
+        <span class="current d-block mt-3">
+            <em>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</em>.
+        </span>
+
+    </span>
+</div>
+
+
+{% endblock %}
