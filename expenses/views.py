@@ -1,12 +1,13 @@
 from django.contrib.messages.constants import SUCCESS
 from django.core.paginator import Paginator
 from django.contrib import messages
+from django.db.models import Sum
 
 from datetime import datetime, timedelta
 from calendar import monthrange
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_list_or_404, get_object_or_404, render
 from .models import Expense
 from django.utils import timezone
 
@@ -146,3 +147,30 @@ def update_expense(request, expense_id):
     return render (request, 'expenses/update_expense.html', {
         'expense': expense,
     })
+
+
+def monthly_chart(request, year_num, month_num):
+    # curr_expenses = get_list_or_404(Expense,
+    #     payment_time__month=month_num,
+    #     payment_time__year=year_num
+    #     )
+
+    labels = []
+    data = []
+
+    expenses_list = Expense.objects.values('payment_time__date').annotate(total_price=Sum('amount')).filter(
+        payment_time__month=month_num,
+        payment_time__year=year_num
+        )
+    
+    for expense in expenses_list:
+        labels.append(expense.get('payment_time__date'))
+        data.append(expense.get('total_price'))
+    
+    return render(request, 'expenses/month_chart.html', {
+        'labels': labels,
+        'data': data,
+        'req_date': datetime(year=year_num, month=month_num, day=1)
+    })
+    
+

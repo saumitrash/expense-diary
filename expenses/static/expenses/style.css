@@ -62,3 +62,10 @@ body{
 .update-input{
     background-color: #fff0ad;
 }
+
+/* Chart css */
+
+.chart-heading{
+    color: #4BC0C0;
+    font-weight: 600;
+}

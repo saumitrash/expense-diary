@@ -13,7 +13,7 @@ class Expense(models.Model):
     payment_time = models.DateTimeField()
 
     def __str__(self) -> str:
-        return self.amount
+        return str(self.amount)
     
     def was_payed_recently(self):
         now = timezone.now()

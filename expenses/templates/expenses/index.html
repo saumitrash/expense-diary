@@ -41,6 +41,12 @@
     {% if not show_add_button %}
         <a class="btn btn-outline-primary mt-5" href="{% url 'expenses:home' %}" role="button">🏡 Go back to home</a>
     {% endif %}
+
+    {% if page_obj %}
+        <a class="btn btn-outline-primary mt-5 float-end me-5" href="{% url 'expenses:monthly_chart' captured_date.year captured_date.month %}" role="button">Monthly Report 📊 </a>
+    {% endif %}    
+    
+
     
     <hr class="mt-5">
 
