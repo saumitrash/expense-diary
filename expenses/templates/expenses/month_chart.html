@@ -12,26 +12,60 @@
     <h3>Here are the details of <span class="chart-heading">{{req_date|date:'F, Y'}}</span> </h3>
 
     <a class="btn btn-outline-primary mt-3 mb-3" href="{% url 'expenses:home' %}" role="button">🏡 Go back to home</a>
+    <a  onclick="downloadChart()" class="btn btn-outline-dark mt-3 mb-3 float-end" id="downloadbtn" href="#" role="button">Download as png</a>
     <hr>
 
-    <canvas id="myChart">
+    <div class="container chart-container">
+        <canvas id="myChart">
 
-    </canvas>
+        </canvas>
+    </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
     {% if labels %}
         <script>
+
+            function extractDate() {
+                let monthName = "";
+                let year = "";
+
+                {% with cap_dt=req_date|date:"F Y" %}
+                    var capd = "{{cap_dt}}";
+                    capd = capd.split(" ")
+                    monthName = capd[0];
+                    year = capd[1];
+                {% endwith %}
+                
+                dateObj = {
+                    month: monthName,
+                    year: year
+                }
+
+                return dateObj
+            }
+
+            function getDataset() {
+                let dates = [];
+
+                {% for d in labels %}
+                    {% with dt=d|date:"SHORT_DATE_FORMAT" %}
+                        var dtt = "{{dt}}";
+                        dates.push(dtt)
+                    {% endwith %}
+                {% endfor %}
+                return dates
+
+            }
+
             var ctx = document.getElementById('myChart').getContext('2d');
 
-            let dates = [];
+            let isChartRendered = false;
+            
+            let dates = getDataset();
+            const monthDateObj = extractDate(); 
 
-            {% for d in labels %}
-                {% with dt=d|date:"SHORT_DATE_FORMAT" %}
-                    var dtt = "{{dt}}";
-                    dates.push(dtt)
-                {% endwith %}
-            {% endfor %}
             
             var chart = new Chart(ctx, {
                 // The type of chart we want to create
@@ -49,8 +83,26 @@
                 },
 
                 // Configuration options go here
-                options: {responsive: true}
+                options: {
+                    responsive: true,
+                    animation: {
+                        onComplete: () => (isChartRendered=true),
+                    }
+                }
+                
             });
+
+            function downloadChart() {
+                if (!isChartRendered) return;
+                else {
+                    let downloadBtn = document.getElementById('downloadbtn');
+                    downloadBtn.href = chart.toBase64Image();
+                    downloadBtn.download = `Report_${monthDateObj.month}_${monthDateObj.year}.png`;
+                    console.log('Download button pressed');
+                    // downloadBtn.click();
+                }
+                
+            }
         
         </script>
         
@@ -60,7 +112,6 @@
     {% endif %}
     
 </div>
-
 
 
 {% endblock %}

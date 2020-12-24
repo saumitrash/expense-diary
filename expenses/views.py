@@ -33,7 +33,7 @@ def index(request, year_num, month_num):
 
     curr_monthly_expense = sum([expense.amount for expense in curr_expenses])
 
-    paginator = Paginator(curr_expenses, 3)
+    paginator = Paginator(curr_expenses, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
