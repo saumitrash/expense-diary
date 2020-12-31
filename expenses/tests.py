@@ -9,10 +9,15 @@ from calendar import monthrange
 from .models import Expense
 
 
-def add_expense(amount=0, days=0, title="default title"):
+def add_expense(amount=0, days=0, title="default title", desc="default desc"):
     time = timezone.now() + timedelta(days=days)
     
-    return Expense.objects.create(amount=amount, payment_time=time, title=title)
+    return Expense.objects.create(
+        amount=amount,
+        payment_time=time,
+        title=title,
+        description=desc
+    )
 
 
 class ExpenseModelTests(TestCase):
@@ -93,7 +98,7 @@ class ExpenseIndexViewTests(TestCase):
         delta_days = -(day+1)
         
         add_expense(amount=500, days=delta_days)
-        response = self.client.get(reverse('expenses:index', args=(year, month-1)))
+        response = self.client.get(reverse('expenses:index', args=(year, (month-1))))
         self.assertNotContains(response, 'Add Expense')
         self.assertEqual(response.status_code, 200)
 
@@ -211,9 +216,8 @@ class ExpenseIndexViewTests(TestCase):
         now = timezone.now()
         day, month, year = now.day, now.month, now.year
         
-        add_expense(amount=500)
-        add_expense(amount=1000)
-        add_expense(amount=1500)
+        for i in range(3):
+            add_expense(amount=(500*(i+1)))
 
         response = self.client.get(reverse('expenses:index', args=(year, month)))
         
@@ -238,13 +242,8 @@ class ExpenseIndexViewTests(TestCase):
         now = timezone.now()
         day, month, year = now.day, now.month, now.year
         
-        add_expense(amount=500)
-        add_expense(amount=500)
-        add_expense(amount=500)
-        add_expense(amount=500)
-        add_expense(amount=500)
-        add_expense(amount=500)
-        add_expense(amount=500)
+        for _ in range(7):
+            add_expense(amount=500)
 
         response = self.client.get(reverse('expenses:index', args=(year, month)))
         
@@ -262,3 +261,9 @@ class ExpenseIndexViewTests(TestCase):
         )
     
     
+# Remaining ------------------------
+# tests for --> update/edit
+# tests for --> delete
+# tests for --> detail
+# tests for --> monthly chart
+# tests for --> detail

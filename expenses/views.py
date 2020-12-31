@@ -23,48 +23,46 @@ def home(request):
 def index(request, year_num, month_num):
     this_time = timezone.now()
     this_day, this_month, this_year = this_time.day, this_time.month, this_time.year
-
-    days_in_this_month = monthrange(this_time.year, this_time.month)[1]
     
-    curr_expenses = Expense.objects.filter(
+    requested_expenses = Expense.objects.filter(
         payment_time__month=month_num,
         payment_time__year=year_num
         )
 
-    curr_monthly_expense = sum([expense.amount for expense in curr_expenses])
-
-    paginator = Paginator(curr_expenses, 6)
+    paginator = Paginator(requested_expenses, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    last_month_expenses = Expense.objects.filter(
-        payment_time__month=month_num-1,
-        payment_time__year=year_num
-        )
+    requested_monthly_expense = sum([expense.amount for expense in requested_expenses])
 
     show_add_button = False
 
     captured_date = datetime(
         year=year_num,
         month=month_num,
-        day=this_day,
+        day=1,
         tzinfo=timezone.get_current_timezone()
         )
 
-    # if this_time - timedelta(days=days_in_this_month) <= approx_date <= this_time:
     if this_time - timedelta(days=this_day) <= captured_date <= this_time:
         show_add_button = True
 
 
-    last_monthly_expense = sum([expense.amount for expense in last_month_expenses])
+    last_monthly_expense = Expense.objects.filter(
+        payment_time__month=(month_num-1),
+        payment_time__year=year_num
+    ).aggregate(Sum('amount'))['amount__sum']
+
+    if not last_monthly_expense:
+        last_monthly_expense = 0
 
     progress = {}
     progress['color'] = {}
-    if curr_monthly_expense > last_monthly_expense:
+    if requested_monthly_expense > last_monthly_expense:
         progress['color']['bg'] = 'expended'
         progress['color']['text'] = 'light'
         progress['tail'] = 'more than'
-    elif curr_monthly_expense < last_monthly_expense:
+    elif requested_monthly_expense < last_monthly_expense:
         progress['color']['bg'] = 'saved'
         progress['color']['text'] = 'dark'
         progress['tail'] = 'less than'
@@ -74,11 +72,11 @@ def index(request, year_num, month_num):
         progress['tail'] = 'Same as'
     
     progress['tail'] += ' last month'
-    progress['difference'] = abs(curr_monthly_expense-last_monthly_expense)
+    progress['difference'] = abs(requested_monthly_expense-last_monthly_expense)
 
     data = {
         # 'expenses': curr_expenses,
-        'curr_monthly_expense': curr_monthly_expense,
+        'curr_monthly_expense': requested_monthly_expense,
         'last_monthly_expense': last_monthly_expense,
         'progress': progress,
         'show_add_button': show_add_button,
@@ -158,14 +156,17 @@ def monthly_chart(request, year_num, month_num):
     labels = []
     data = []
 
-    expenses_list = Expense.objects.values('payment_time__date').annotate(total_price=Sum('amount')).filter(
-        payment_time__month=month_num,
-        payment_time__year=year_num
+    expenses_list = Expense.objects.values('payment_time__day')\
+        .order_by('payment_time__day')\
+        .annotate(total_expenses=Sum('amount'))\
+        .filter(
+            payment_time__month=month_num,
+            payment_time__year=year_num
         )
     
     for expense in expenses_list:
         labels.append(expense.get('payment_time__date'))
-        data.append(expense.get('total_price'))
+        data.append(expense.get('total_expenses'))
     
     return render(request, 'expenses/month_chart.html', {
         'labels': labels,

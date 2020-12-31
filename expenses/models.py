@@ -23,4 +23,5 @@ class Expense(models.Model):
         return now - datetime.timedelta(days=day) <= self.payment_time <= now
     
     class Meta:
-        ordering = ['-payment_time'] # descending order --> most recent first
+        # ordering = ['-payment_time__day'] # do not have to use order_by (for daily aggregation)
+        ordering = ['-payment_time'] # descending order --> most recent first, have to use order_by (for daily aggregation)
