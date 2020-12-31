@@ -114,6 +114,9 @@ def add_expense(request):
 def delete_expense(request, expense_id):
     if request.method=='POST':
         expense = get_object_or_404(Expense, id=expense_id)
+        expense_time = expense.payment_time
+        month, year = expense_time.month, expense_time.year
+
         expense.delete()
 
         messages.add_message(request, level=SUCCESS,
@@ -121,7 +124,7 @@ def delete_expense(request, expense_id):
             extra_tags='safe'
         )
         
-        return HttpResponseRedirect(reverse('expenses:home'))
+        return HttpResponseRedirect(reverse('expenses:index', args=(year,month)))
 
     else:
         messages.add_message(request, level=messages.ERROR,
@@ -195,7 +198,7 @@ def delete_expenses_monthly(request, year_num, month_num):
             extra_tags='safe'
         )
 
-        return HttpResponseRedirect(reverse('expenses:home'))
+        return HttpResponseRedirect(reverse('expenses:index', args=(year_num, month_num)))
 
     else:
         messages.add_message(request, level=messages.ERROR,
