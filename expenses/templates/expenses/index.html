@@ -39,11 +39,18 @@
     <a class="btn btn-outline-secondary mt-5 me-md-3 past-expense" href="{% url 'expenses:index' captured_date.year captured_date.month|add:'-1' %}" role="button">📆 Past Month</a>
 
     {% if not show_add_button %}
-        <a class="btn btn-outline-primary mt-5" href="{% url 'expenses:home' %}" role="button">🏡 Go back to home</a>
+        <a class="btn btn-outline-primary mt-5 me-3" href="{% url 'expenses:home' %}" role="button">🏡 Go back to home</a>
     {% endif %}
 
     {% if page_obj %}
-        <a class="btn btn-outline-primary mt-5 float-end me-5" href="{% url 'expenses:monthly_chart' captured_date.year captured_date.month %}" role="button">Monthly Report 📊 </a>
+        <a class="btn btn-outline-primary mt-5" href="{% url 'expenses:monthly_chart' captured_date.year captured_date.month %}" role="button">Monthly Report 📊 </a>
+        <a class="btn btn-outline-danger mt-5 float-end me-5" href="#" role="button" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
+            Delete this month's expenses
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+            </svg>
+        </a>
+
     {% endif %}    
     
 
@@ -62,7 +69,7 @@
         <!-- change expenses:page_obj -->
         {% for expense in page_obj %}
         <div class="col">
-            <div class="card text-dark bg-transparent mb-3" style="max-width: 22rem;">
+            <div class="card text-dark bg-transparent mx-auto mb-3" style="max-width: 22rem;">
 
                 <div class="card-header amount">
                     Rs. 
@@ -81,11 +88,17 @@
                     <h5 class="card-title ctitle">{{expense.title|truncatechars:25}}</h5>
                     <p class="card-text">{{ expense.description|truncatechars:25 }}</p>
                     <a href="{% url 'expenses:detail' expense.id %}" class="btn btn-outline-primary btn-sm">View Details</a>
-                    <a href="{% url 'expenses:delete_expense' expense.id%}" class="btn btn-outline-danger btn-sm float-end"  data-bs-toggle="tooltip" data-bs-placement="right" title="Delete">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
-                        </svg>
-                    </a>
+                    
+                    <!-- Form for deleting an expense item -->
+                    <form class="float-end" action="{% url 'expenses:delete_expense' expense.id%}" method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-danger btn-sm float-end" type="submit" data-bs-toggle="tooltip" data-bs-placement="right" title="Delete">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
+                            </svg>
+                        </button>
+                    </form>
+
                 </div>
             </div>
         </div>
@@ -111,11 +124,35 @@
             {% endif %}
         </span>
 
-        <span class="current d-block mt-3">
+        <span class="current d-block mt-3 mb-3">
             <em>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</em>.
         </span>
 
     </span>
+</div>
+
+<!-- Vertically centered modal -->
+<div class="modal fade" id="deleteAllModal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Delete all expenses of current month</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            This action is irreversible and will delete all the expenses that you added this month
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <form action="{% url 'expenses:delete_monthly' captured_date.year captured_date.month %}" method="post">
+                {% csrf_token %}
+                <button class="btn btn-danger" type="submit" name="delete_all" value="confirmed">
+                    Yes, I wish to Proceed
+                </button>
+            </form>
+          </div>
+        </div>
+    </div>
 </div>
 
 

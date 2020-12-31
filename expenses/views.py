@@ -112,13 +112,24 @@ def add_expense(request):
 
 
 def delete_expense(request, expense_id):
-    expense = get_object_or_404(Expense, id=expense_id)
-    expense.delete()
-    
-    messages.add_message(request, level=SUCCESS, message='Successfully <b>deleted</b> the expense!', extra_tags='safe')
+    if request.method=='POST':
+        expense = get_object_or_404(Expense, id=expense_id)
+        expense.delete()
 
-    return HttpResponseRedirect(reverse('expenses:home'))
+        messages.add_message(request, level=SUCCESS,
+            message='Successfully <b>deleted</b> the requested item!',
+            extra_tags='safe'
+        )
+        
+        return HttpResponseRedirect(reverse('expenses:home'))
 
+    else:
+        messages.add_message(request, level=messages.ERROR,
+            message='Invalid request to delete an item!',
+            extra_tags='safe'
+        )
+
+        return HttpResponseRedirect(reverse('expenses:home'))
 
 def update_expense(request, expense_id):
     if request.method == 'POST':
@@ -148,11 +159,6 @@ def update_expense(request, expense_id):
 
 
 def monthly_chart(request, year_num, month_num):
-    # curr_expenses = get_list_or_404(Expense,
-    #     payment_time__month=month_num,
-    #     payment_time__year=year_num
-    #     )
-
     labels = []
     data = []
 
@@ -173,5 +179,28 @@ def monthly_chart(request, year_num, month_num):
         'data': data,
         'req_date': datetime(year=year_num, month=month_num, day=1)
     })
-    
 
+
+def delete_expenses_monthly(request, year_num, month_num):
+    if request.method=='POST':
+        expenses = get_list_or_404(
+            Expense, payment_time__month=month_num, payment_time__year=year_num
+        )
+
+        for expense in expenses:
+            expense.delete()
+        
+        messages.add_message(request, level=SUCCESS,
+            message='Successfully <b>deleted</b> all of the expense in the requested month!',
+            extra_tags='safe'
+        )
+
+        return HttpResponseRedirect(reverse('expenses:home'))
+
+    else:
+        messages.add_message(request, level=messages.ERROR,
+            message='Invalid request to delete items!',
+            extra_tags='safe'
+        )
+
+        return HttpResponseRedirect(reverse('expenses:index', args=(year_num, month_num)))

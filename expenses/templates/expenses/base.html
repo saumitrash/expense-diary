@@ -41,7 +41,15 @@
             alertList.forEach(function (alert) {
                 new bootstrap.Alert(alert)
             });
-            
+
+            // delete confirmation modal
+
+            var myModal = document.getElementById('myModal')
+            var myInput = document.getElementById('myInput')
+
+            myModal.addEventListener('shown.bs.modal', function () {
+                myInput.focus()
+            })
 
         </script>
         

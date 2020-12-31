@@ -11,5 +11,6 @@ urlpatterns = [
     path('expense/update/<int:expense_id>/', views.update_expense, name='update'),
     path('expense/delete/<int:expense_id>', views.delete_expense, name='delete_expense'),
     path('expense/add_expense/', views.add_expense, name='add_expense'),
+    path('expense/delete_expenses_monthly/<int:year_num>/<int:month_num>/', views.delete_expenses_monthly, name='delete_monthly'),
     path('expense/chart/<int:year_num>/<int:month_num>/', views.monthly_chart, name='monthly_chart'),
 ]

@@ -18,7 +18,7 @@
         <div class="row mb-3">
             <label for="inputText3" class="col-sm-2 col-form-label">Paid for</label>
             <div class="col-sm-10">
-              <input type="text" class="form-control update-input" name="title" value="{{expense.title}}" id="inputText3">
+              <input type="text" class="form-control update-input" name="title" placeholder="{{expense.title}}" id="inputText3">
             </div>
           </div>
     
@@ -26,14 +26,15 @@
             <label for="inputDesc3" class="col-sm-2 col-form-label">Description</label>
             
             <div class="col-sm-10">
-              <input type="text" class="form-control update-input" name="desc" value="{{expense.description}}" id="inputDesc3">
+              <textarea class="form-control update-input" rows="3" name="desc" id="inputDesc3" maxlength="200"  placeholder="{{expense.description}}"></textarea>
+              
             </div>
           </div>
     
           <div class="row mb-3">
             <label for="inputPrice3" class="col-sm-2 col-form-label">Amount Paid</label>
             <div class="col-sm-10">
-              <input type="number" class="form-control update-input" name="price" value="{{expense.amount}}" id="inputPrice3">
+              <input type="number" class="form-control update-input" name="price" placeholder="{{expense.amount}}" id="inputPrice3">
             </div>
           </div>
     
