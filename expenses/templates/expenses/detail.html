@@ -4,52 +4,56 @@
 
 {% load humanize %}
 
-{% block title %}ExpenseDiary: Expense {{expense.id}}{% endblock %}
+{% block title %}ExpenseDiary: Expense
+    {{ expense.id }}
+{% endblock %}
 
 {% block content %}
 
-<div class="container-sm mt-5">
-    <h3>Expense ID: #{{expense.id}}</h3>
-    <h4 class="text-muted">Expense Title: {{expense.title}}</h4>
+    <div class="container-sm mt-5">
+        <h3>Expense ID: #{{ expense.id }}</h3>
+        <h4 class="text-muted">Expense Title:
+            {{ expense.title }}</h4>
 
-    <a class="btn btn-outline-primary mt-5" href="{% url 'expenses:home' %}" role="button">🏡 Go back to home</a>
+        <a class="btn btn-outline-primary mt-5" href="{% url 'expenses:home' %}" role="button">🏡 Go back to home</a>
 
-    <table class="table mt-5">
-        <thead>
-          <tr>
-            <th scope="col">Property</th>
-            <th scope="col">Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">
-                {% if expense.description %}
-                    Description
-                {% endif %}
-            </th>
-            <td>{{expense.description}}</td>
-          </tr>
-          <tr>
-            <th scope="row">Amount Paid</th>
-            <td>Rs. {{expense.amount|intcomma}}</td>
-          </tr>
-          <tr>
-            <th scope="row">Date of Payment</th>
-            <td>{{expense.payment_time|date:'F d, Y'}}</td>
-          </tr>
-          <tr>
-            <th scope="row">Day of Payment</th>
-            <td>{{expense.payment_time|date:'l'}}</td>
-          </tr>
-          <tr>
-            <th scope="row">Exact Time of Payment</th>
-            <td>{{expense.payment_time|time:'H:i'}}</td>
-          </tr>
-        </tbody>
-      </table>
+        <table class="table mt-5">
+            <thead>
+                <tr>
+                    <th scope="col">Property</th>
+                    <th scope="col">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">
+                        {% if expense.description %}
+                            Description
+                        {% endif %}
+                    </th>
+                    <td>{{ expense.description }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Amount Paid</th>
+                    <td>Rs.
+                        {{ expense.amount|intcomma }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Date of Payment</th>
+                    <td>{{ expense.payment_time|date:'F d, Y' }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Day of Payment</th>
+                    <td>{{ expense.payment_time|date:'l' }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Exact Time of Payment</th>
+                    <td>{{ expense.payment_time|time:'H:i' }}</td>
+                </tr>
+            </tbody>
+        </table>
 
-</div>
+    </div>
 
 
 {% endblock %}

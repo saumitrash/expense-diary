@@ -3,115 +3,119 @@
 {% load static %}
 
 
-{% block title %} Monthly Chart {% endblock %}
+{% block title %}
+    Monthly Chart
+{% endblock %}
 
 {% block content %}
 
-<div class="container mt-5" style="max-width: 60%;">
+    <div class="container mt-5" style="max-width: 60%;">
 
-    <h3>Here are the details of <span class="chart-heading">{{req_date|date:'F, Y'}}</span> </h3>
+        <h3>Here are the details of
+            <span class="chart-heading">{{ req_date|date:'F, Y' }}</span>
+        </h3>
 
-    <a class="btn btn-outline-primary mt-3 mb-3" href="{% url 'expenses:home' %}" role="button">🏡 Go back to home</a>
-    <a  onclick="downloadChart()" class="btn btn-outline-dark mt-3 mb-3 float-end" id="downloadbtn" href="#" role="button">Download as png</a>
-    <hr>
+        <a class="btn btn-outline-primary mt-3 mb-3" href="{% url 'expenses:home' %}" role="button">🏡 Go back to home</a>
+        <a onclick="downloadChart()" class="btn btn-outline-dark mt-3 mb-3 float-end" id="downloadbtn" href="#" role="button">Download as png</a>
+        <hr>
 
-    <div class="container chart-container">
-        <canvas id="myChart">
-
-        </canvas>
-    </div>
+            <div class="container chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
-    {% if labels %}
-        <script>
+            {% if labels %}
+                <script>
 
-            function extractDate() {
-                let monthName = "";
-                let year = "";
+                    function extractDate() {
+                        let monthName = "";
+                        let year = "";
 
-                {% with cap_dt=req_date|date:"F Y" %}
-                    var capd = "{{cap_dt}}";
-                    capd = capd.split(" ")
-                    monthName = capd[0];
-                    year = capd[1];
-                {% endwith %}
-                
-                dateObj = {
-                    month: monthName,
-                    year: year
-                }
+                        {% with cap_dt=req_date|date:"F Y" %}
+                        var capd = "{{ cap_dt }}";
+                        capd = capd.split(" ")
+                        monthName = capd[0];
+                        year = capd[1];
+                        {% endwith %}
 
-                return dateObj
-            }
+                        dateObj = {
+                            month: monthName,
+                            year: year
+                        }
 
-            function getDataset() {
-                let dates = [];
-
-                {% for d in labels %}
-                    {% with dt=d|date:"SHORT_DATE_FORMAT" %}
-                        var dtt = "{{dt}}";
-                        dates.push(dtt)
-                    {% endwith %}
-                {% endfor %}
-                return dates
-
-            }
-
-            var ctx = document.getElementById('myChart').getContext('2d');
-
-            let isChartRendered = false;
-            
-            let dates = getDataset();
-            const monthDateObj = extractDate(); 
-
-            
-            var chart = new Chart(ctx, {
-                // The type of chart we want to create
-                type: 'line',
-
-                // The data for our dataset
-                data: {
-                    labels: dates,
-                    datasets: [{
-                        label: 'Total spent',
-                        backgroundColor: 'rgb(0, 0, 0,0.0)',
-                        borderColor: '#4BC0C0',
-                        data: {{ data|safe }},
-                    }]
-                },
-
-                // Configuration options go here
-                options: {
-                    responsive: true,
-                    animation: {
-                        onComplete: () => (isChartRendered=true),
+                        return dateObj
                     }
-                }
-                
-            });
 
-            function downloadChart() {
-                if (!isChartRendered) return;
-                else {
-                    let downloadBtn = document.getElementById('downloadbtn');
-                    downloadBtn.href = chart.toBase64Image();
-                    downloadBtn.download = `Report_${monthDateObj.month}_${monthDateObj.year}.png`;
-                    console.log('Download button pressed');
-                    // downloadBtn.click();
-                }
-                
-            }
-        
-        </script>
-        
-    {% else %}
-        <h1 class="shrugged text-center">¯\_(ツ)_/¯</h1>
-        <h5 class="mt-4 text-center shrugged-caption">You didn't spend a single penny this month</h5>
-    {% endif %}
-    
-</div>
+                    function getDataset() {
+                        let dates = [];{% for d in labels %}
+                            {% with dt=d|date:"SHORT_DATE_FORMAT" %}
+                            var dtt = "{{ dt }}";
+                            dates.push(dtt){% endwith %}
+                        {% endfor %}
+                        return dates
+
+                    }
+
+                    var ctx = document.getElementById('myChart').getContext('2d');
+
+                    let isChartRendered = false;
+
+                    let dates = getDataset();
+                    const monthDateObj = extractDate();
 
 
-{% endblock %}
+                    var chart = new Chart(ctx, { // The type of chart we want to create
+                        type: 'line',
+
+                        // The data for our dataset
+                        data: {
+                            labels: dates,
+                            datasets: [
+                                {
+                                    label: 'Total spent',
+                                    backgroundColor: 'rgb(0, 0, 0,0.0)',
+                                    borderColor: '#4BC0C0',
+                                    data: {{ data|safe }}
+                                }
+                            ]
+                        },
+
+                        // Configuration options go here
+                        options: {
+                            responsive: true,
+                            animation: {
+                                onComplete: () => (isChartRendered = true)
+                            }
+                        }
+
+                    });
+
+                    function downloadChart() {
+                        if (! isChartRendered) 
+                            return;
+                         else {
+                            let downloadBtn = document.getElementById('downloadbtn');
+                            downloadBtn.href = chart.toBase64Image();
+                            downloadBtn.download = `Report_${
+                                monthDateObj.month
+                            }_${
+                                monthDateObj.year
+                            }.png`;
+                            console.log('Download button pressed');
+                            // downloadBtn.click();
+                        }
+
+                    }
+                </script>
+
+            {% else %}
+                <h1 class="shrugged text-center">¯\_(ツ)_/¯</h1>
+                <h5 class="mt-4 text-center shrugged-caption">You didn't spend a single penny this month</h5>
+            {% endif %}
+
+        </div>
+
+
+    {% endblock %}

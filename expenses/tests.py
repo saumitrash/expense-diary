@@ -7,6 +7,8 @@ from django.utils import timezone
 
 from .models import Expense
 
+truncation = 25 - 1
+
 
 def add_expense(amount=0, days=0, title="default title", desc="default desc"):
     time = timezone.now() + timedelta(days=days)
@@ -312,9 +314,7 @@ class ExpenseDetailViewTests(TestCase):
 
         response = self.client.get(reverse('expenses:detail', args=(1, )))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response,
-            '<h4 class="text-muted">Expense Title: Custom Expense Test</h4>')
+        self.assertContains(response, 'Custom Expense Test')
         self.assertContains(response, '1,534,500', count=1)
 
 
@@ -349,22 +349,62 @@ class ExpenseUpdateTests(TestCase):
         add_expense(amount=500)
         add_expense(amount=1000)
         path_to_post = reverse('expenses:update', args=(e.id, ))
-        response = self.client.post(path_to_post, data={
-            'price':1500,
-            'title':'updated test expense title',
-            'desc': 'updated test expense description'
-        })
-            
+
+        update_title = 'updated test expense title'
+        update_desc = 'updated test expense description'
+
+        response = self.client.post(path_to_post,
+                                    data={
+                                        'price': 1500,
+                                        'title': update_title,
+                                        'desc': update_desc
+                                    })
+
         self.assertEqual(response.status_code, 302)
 
         index_response = self.client.get(
             reverse('expenses:index', args=(year, month)))
-        
+
         self.assertContains(index_response,
                             'Successfully <b>updated</b> the expense!')
         self.assertContains(index_response, '3,000.0')
+        self.assertContains(index_response, update_title[:24])  # truncation
+        self.assertContains(index_response, update_desc[:24])  # truncation
+
+    def test_update_past_expense(self):
+        now = timezone.now()
+        year, month, days = now.year, now.month, now.day
+        delta_days = -(days + 1)
+
+        old_time = now + timedelta(days=delta_days)
+
+        e = add_expense(amount=500, days=delta_days)
+        add_expense(amount=500, days=delta_days)
+        add_expense(amount=1000, days=delta_days)
+
+        path_to_post = reverse('expenses:update', args=(e.id, ))
+
+        update_title = 'updated test expense title'
+        update_desc = 'updated test expense description'
+
+        response = self.client.post(path_to_post,
+                                    data={
+                                        'price': 1500,
+                                        'title': update_title,
+                                        'desc': update_desc
+                                    })
+
+        self.assertEqual(response.status_code, 302)
+
+        index_response = self.client.get(
+            reverse('expenses:index', args=(old_time.year, old_time.month)))
+
+        self.assertContains(index_response,
+                            'Successfully <b>updated</b> the expense!')
+        self.assertContains(index_response, '3,000.0')
+        self.assertContains(index_response, update_title[:24])  # truncation
+        self.assertContains(index_response, update_desc[:24])  # truncation
+
 
 # Remaining ------------------------
-# tests for --> update (POST)
-# tests for --> delete (POST)
 # tests for --> monthly chart (GET)

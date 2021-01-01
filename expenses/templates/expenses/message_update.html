@@ -2,8 +2,8 @@
 
     {% for message in messages %}
 
-        
-        <div class="alert alert-{{message.level_tag|lower}} alert-dismissible fade show mt-4" role="alert">
+
+        <div class="alert alert-{{ message.level_tag|lower }} alert-dismissible fade show mt-4" role="alert">
             {% if 'safe' in message.tags %}
                 {{ message|safe }}
             {% else %}
