@@ -59,6 +59,14 @@ class ExpenseHomeViewTests(TestCase):
         
 
 class ExpenseIndexViewTests(TestCase):
+    def test_past_expense_route_edge(self):
+        # now = timezone.now()
+        # month, year = now.month, now.year
+        month, year = 1,2021
+        response = self.client.get(reverse('expenses:index', args=(year, month)))
+        self.assertEqual(response.context['prev'], {'year':2020, 'month':12})
+
+
     def test_no_expenses(self):
         """
         If no expenses exist, an appropriate message is displayed.
@@ -70,6 +78,7 @@ class ExpenseIndexViewTests(TestCase):
         self.assertContains(response, "No expenses were found")
         self.assertQuerysetEqual(response.context['page_obj'], [])
     
+
     def test_past_expense_on_present_index(self):
         """
         expenses with a payment_date in the past are not
@@ -98,7 +107,10 @@ class ExpenseIndexViewTests(TestCase):
         delta_days = -(day+1)
         
         add_expense(amount=500, days=delta_days)
-        response = self.client.get(reverse('expenses:index', args=(year, (month-1))))
+        old_time = now + timedelta(days=delta_days)
+        old_year, old_month = old_time.year, old_time.month
+
+        response = self.client.get(reverse('expenses:index', args=(old_year, old_month)))
         self.assertNotContains(response, 'Add Expense')
         self.assertEqual(response.status_code, 200)
 
@@ -200,6 +212,7 @@ class ExpenseIndexViewTests(TestCase):
         
         self.assertContains(response, "badge-same")
         self.assertContains(response, "Same as last month")
+        self.assertNotContains(response, "Rs. 0 Same as last month")
 
         self.assertTrue(len(response.context['page_obj']) == 1)
         
@@ -253,17 +266,63 @@ class ExpenseIndexViewTests(TestCase):
         self.assertContains(response, "more than last month")
 
         self.assertTrue(len(response.context['page_obj']) == 6)
-
-        
+    
         self.assertQuerysetEqual(
             response.context['page_obj'],
             [repr(x) for x in Expense.objects.filter(payment_time__month=month, payment_time__year=year)[:6]]
         )
+
+    def test_expense_intcomma(self):
+        now = timezone.now()
+        year, month = now.year, now.month
+
+        add_expense(amount=40500)
+
+        response = self.client.get(reverse('expenses:index', args=(year, month)))
+        self.assertContains(response, '40,500.0', count=3)
     
+    def test_expense_intword_million(self):
+        now = timezone.now()
+        year, month = now.year, now.month
+
+        add_expense(amount=1200000)
+
+        response = self.client.get(reverse('expenses:index', args=(year, month)))
+        
+        # count=3, as no expenses in last month so (2 badges, 1 card header)
+        self.assertContains(response, '1.2 million', count=3)
+
+    def test_expense_intword_billion(self):
+        now = timezone.now()
+        year, month = now.year, now.month
+
+        add_expense(amount=1200000000)
+
+        response = self.client.get(reverse('expenses:index', args=(year, month)))
+        
+        # count=3, as no expenses in last month so (2 badges, 1 card header)
+        self.assertContains(response, '1.2 billion', count=3)
     
+class ExpenseDetailViewTests(TestCase):
+    def test_detail_no_expenses(self):
+        test_id = 1 # number doesn't matter as there is no item yet
+        response = self.client.get(reverse('expenses:detail', args=(1,)))
+        self.assertEqual(response.status_code, 404)
+    
+    def test_detail_expense(self):
+        add_expense(amount=1534500, title='Custom Expense Test')
+
+        response = self.client.get(reverse('expenses:detail', args=(1,)))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<h4 class="text-muted">Expense Title: Custom Expense Test</h4>')
+        self.assertContains(response, '1,534,500', count=1)
+    
+
+
+
+
 # Remaining ------------------------
-# tests for --> update/edit
-# tests for --> delete
-# tests for --> detail
-# tests for --> monthly chart
-# tests for --> detail
+# tests for --> update/edit (POST)
+# tests for --> delete (POST)
+# tests for --> detail (GET)
+# tests for --> monthly chart (GET)

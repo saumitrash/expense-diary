@@ -21,12 +21,14 @@
             {% endif %}
         </span>
         <span class="badge month-stats text-{{progress.color.text}} badge-{{progress.color.bg}}"> <!-- bg-{{progress.color}} -->
+            {% if progress.color.bg != 'same' %}
                 Rs. 
                 {% if progress.difference > 1000000 %}
                     {{progress.difference|intword}}
                 {% else %}
                     {{progress.difference|intcomma}}
                 {% endif %}
+            {% endif %}
             {{progress.tail}}
         </span>
     </h3>
@@ -36,7 +38,7 @@
         <a class="btn btn-outline-dark mt-5 me-md-3 greenbg" href="{% url 'expenses:add' %}" role="button">💰 Add Expense</a>
     {% endif %}
 
-    <a class="btn btn-outline-secondary mt-5 me-md-3 past-expense" href="{% url 'expenses:index' captured_date.year captured_date.month|add:'-1' %}" role="button">📆 Past Month</a>
+    <a class="btn btn-outline-secondary mt-5 me-md-3 past-expense" href="{% url 'expenses:index' prev.year prev.month %}" role="button">📆 Past Month</a>
 
     {% if not show_add_button %}
         <a class="btn btn-outline-primary mt-5 me-3" href="{% url 'expenses:home' %}" role="button">🏡 Go back to home</a>

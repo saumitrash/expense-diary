@@ -46,11 +46,22 @@ def index(request, year_num, month_num):
 
     if this_time - timedelta(days=this_day) <= captured_date <= this_time:
         show_add_button = True
-
+    
+    prev_exp_month = month_num - 1
+    prev_exp_year = year_num
+    
+    if prev_exp_month == 0:
+        prev_exp_month = 12
+        prev_exp_year -= 1
+    
+    prev = {
+        'month':prev_exp_month,
+        'year':prev_exp_year
+    }
 
     last_monthly_expense = Expense.objects.filter(
-        payment_time__month=(month_num-1),
-        payment_time__year=year_num
+        payment_time__month=prev_exp_month,
+        payment_time__year=prev_exp_year
     ).aggregate(Sum('amount'))['amount__sum']
 
     if not last_monthly_expense:
@@ -76,6 +87,7 @@ def index(request, year_num, month_num):
 
     data = {
         # 'expenses': curr_expenses,
+        'prev':prev,
         'curr_monthly_expense': requested_monthly_expense,
         'last_monthly_expense': last_monthly_expense,
         'progress': progress,
