@@ -40,10 +40,15 @@ def index(request, year_num, month_num):
 
     show_add_button = False
 
+    # captured_date = datetime(year=year_num,
+    #                          month=month_num,
+    #                          day=1,
+    #                          tzinfo=timezone.get_current_timezone())
     captured_date = datetime(year=year_num,
                              month=month_num,
                              day=1,
-                             tzinfo=timezone.get_current_timezone())
+                             tzinfo=timezone.utc)
+
 
     if this_time - timedelta(days=this_day) <= captured_date <= this_time:
         show_add_button = True
@@ -203,7 +208,9 @@ def monthly_chart(request, year_num, month_num):
         )
 
     for expense in expenses_list:
-        labels.append(expense.get('payment_time__date'))
+        expense_day = expense.get('payment_time__day')
+        expense_date = datetime(year=year_num, month=month_num, day=expense_day)
+        labels.append(expense_date)
         data.append(expense.get('total_expenses'))
 
     return render(

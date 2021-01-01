@@ -34,10 +34,10 @@
                         let year = "";
 
                         {% with cap_dt=req_date|date:"F Y" %}
-                        var capd = "{{ cap_dt }}";
-                        capd = capd.split(" ")
-                        monthName = capd[0];
-                        year = capd[1];
+                            var capd = "{{ cap_dt }}";
+                            capd = capd.split(" ")
+                            monthName = capd[0];
+                            year = capd[1];
                         {% endwith %}
 
                         dateObj = {
@@ -49,10 +49,13 @@
                     }
 
                     function getDataset() {
-                        let dates = [];{% for d in labels %}
+                        let dates = [];
+                        
+                        {% for d in labels %}
                             {% with dt=d|date:"SHORT_DATE_FORMAT" %}
-                            var dtt = "{{ dt }}";
-                            dates.push(dtt){% endwith %}
+                                var dtt = "{{ dt }}";
+                                dates.push(dtt)
+                            {% endwith %}
                         {% endfor %}
                         return dates
 
