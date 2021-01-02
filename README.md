@@ -63,7 +63,7 @@ In case you want to delete all the expenses in a month, you can do that too.
 ### Ordering of Expense Items
 Expense item cards are ordered by "recent". The most recently added card shows up at front.
 
-![](images/annotated/ordering/order.png)
+![](images/annotated/Ordering/order.png)
 
 ### Expenses in the past month
 
