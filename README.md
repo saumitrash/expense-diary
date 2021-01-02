@@ -17,7 +17,6 @@ A simple Django application to keep track of your monthly expenses. It also prov
     - [Expense Badges](#expense-badges)
     - [Pagination](#pagination)
   - [Testing](#testing)
-  - [](#)
 
 
 
@@ -96,33 +95,8 @@ If you have added enough items you will see the pagination links at the bottom t
 ![](images/pagination/pagination_1.png)  |  ![](images/pagination/pagination_2.png) | ![](images/pagination/pagination_3.png)
 
 
-
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-![](images/base.png)
-
 ## Testing
 
-```python
+```
 python manage.py test expenses
 ```
-## 
