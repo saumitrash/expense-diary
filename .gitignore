@@ -10,6 +10,10 @@ features.md
 # wireframe
 wireframe.pdf
 
+# extra images
+images/not_annotated/
+images/spare/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
